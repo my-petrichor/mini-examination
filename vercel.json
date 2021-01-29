@@ -1,0 +1,15 @@
+{
+    "routes":
+    [
+        {
+        "src": "/student/math", 
+        "dest": "/api/main.go"
+    }
+    ],
+    
+    "build": {
+        "env": {
+            "GO_BUILD_FLAGS": "-ldflags '-s -w'"
+        }
+    }
+}
