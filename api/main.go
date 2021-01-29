@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"regexp"
 	"strconv"
@@ -133,22 +134,23 @@ func DocDetail(w http.ResponseWriter, req *http.Request) {
 	token := os.Getenv("token")
 	namespace := "my-sakura/chaos"
 	slug := "bd8wks"
-	var f front
-	f.Answers = make([]answer, 0)
-	f.Questions = make([]question, 0)
+
 	var a answer
 	var q question
 
 	doc := api.GetDocumentInfo(token, namespace, slug)
 	//parse yuque document's content and save to custom structure
 	p := parseYuQueBank(doc.Data.Body)
+
 	p.name = doc.Data.Title
 
 	//Get the serial number of randomly selected questions in the question bank
 	ids := generateQuestionBank(len(p.questions), p.questionNumber)
 
-	// fmt.Fprintf(w, "库名:%s\n题目总数量:%d\n随机选择题目ID:%v\n", p.name, p.questionNumber, ids)
 	//Generating JSON formats
+	var f front
+	f.Answers = make([]answer, 0)
+	f.Questions = make([]question, 0)
 	for i, id := range ids {
 		q.Id = i + 1
 		q.Content = p.questions[id-1].Content
@@ -157,17 +159,21 @@ func DocDetail(w http.ResponseWriter, req *http.Request) {
 		f.Questions = append(f.Questions, q)
 		f.Answers = append(f.Answers, a)
 		// fmt.Fprintf(w, "第%d题: %s\n答案: %s\n", i+1, p.questions[id-1].Content, p.answers[id-1].Content)
+
 	}
+
 	data, err := json.Marshal(f)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Fprintf(w, string(data))
+
+	w.Header().Set("content-type", "text/json")
+	w.Write(data)
 }
 
 func main() {
 	http.HandleFunc("/student/math", DocDetail)
-	err := http.ListenAndServe(":1234", nil)
+	err := http.ListenAndServe(":6666", nil)
 	if err != nil {
 		fmt.Println(err)
 	}
