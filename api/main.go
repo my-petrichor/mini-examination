@@ -170,11 +170,3 @@ func DocDetail(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("content-type", "text/json")
 	w.Write(data)
 }
-
-func main() {
-	http.HandleFunc("/student/math", DocDetail)
-	err := http.ListenAndServe(":6666", nil)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
