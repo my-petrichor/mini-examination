@@ -81,14 +81,14 @@ func parseYuQueBank(content string) *paper {
 				content := result[i+1]
 				if strings.HasSuffix(content, "<br") {
 					content = strings.TrimSuffix(content, "<br")
-					if strings.Contains(content, "，") {
-						a.Content = append(a.Content, strings.Split(content, "，")...)
+					if strings.Contains(content, "@") {
+						a.Content = append(a.Content, strings.Split(content, "@")...)
 					} else {
 						a.Content = append(a.Content, content)
 					}
 				} else {
-					if strings.Contains(content, "，") {
-						a.Content = append(a.Content, strings.Split(content, "，")...)
+					if strings.Contains(content, "@") {
+						a.Content = append(a.Content, strings.Split(content, "@")...)
 					} else {
 						a.Content = append(a.Content, content)
 					}
