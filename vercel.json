@@ -4,6 +4,14 @@
         {
         "src": "/student/math", 
         "dest": "/api/main.go"
+    },
+    {
+        "src": "/api/assets/background",
+        "dest": "/src/pictures/background.png"
+    },
+    {
+        "src": "/api/assets/icon",
+        "dest": "/src/pictures/icon.png"
     }
     ],
     
