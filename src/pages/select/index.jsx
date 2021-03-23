@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { View, Text, Image } from '@tarojs/components'
-import { AtButton, AtInput } from 'taro-ui'
+import { View, Text, Image, Input, Form, Button } from '@tarojs/components'
+import { AtButton } from 'taro-ui'
 import Taro, { getCurrentInstance } from '@tarojs/taro'
 
 import icon from '../../pictures/icon.png'
@@ -33,13 +33,8 @@ export default class Index extends Component {
       input: new Array(blank_number).fill(''),
       date: new Date(),
       time: '00:00:00',
-      inputOne: 'flex',
-      inputTwo: 'none',
-      inputThree: 'none',
-      valueOne: '',
-      valueTwo: '',
-      valueThree: '',
       answerResult: '',
+      inputStyle: '' 
     }
   }
 
@@ -51,7 +46,7 @@ export default class Index extends Component {
   }
 
   tick () {
-      let now =  new Date()
+      let now = new Date()
       this.dateDiff = now.getTime() - this.state.date.getTime()       
       // let dayDiff = Math.floor(dateDiff / (24 * 3600 * 1000))
       let leave1 = this.dateDiff % (24 * 3600 * 1000)
@@ -75,7 +70,7 @@ export default class Index extends Component {
     }
 
   componentWillMount() {
-    if (this.state.currentPageId == 5) {
+    if (this.state.currentPageId == this.state.questions.length) {
       this.setState({
         nextButton: '统计'
       })
@@ -83,20 +78,6 @@ export default class Index extends Component {
     var blankNumberArray = []
     for (let i = 1; i <= this.state.blank_number; i++) {
       blankNumberArray.push(i)
-    }
-
-    //todo
-    switch (this.state.blank_number) {
-      case 2:
-        this.setState({
-          inputTwo: 'flex'
-        })
-        break
-      case 3:
-        this.setState({
-          inputTwo: 'flex',
-          inputThree: 'flex'
-        })
     }
 
     for (let x of this.state.questions) {
@@ -112,7 +93,8 @@ export default class Index extends Component {
   }
 
   navigateTo = (currentPageId, nextPageId) => {
-    if (currentPageId == 5) {
+    //two
+    if (currentPageId == this.state.questions.length) {
       Taro.redirectTo({
         url: '/pages/statistic/index'
       })
@@ -130,7 +112,12 @@ export default class Index extends Component {
     }
   }
 
-  submit = () => {
+  formSubmit = (e) => {
+    let inputValue = []
+    for (let x of this.state.blankNumberArray) {
+        inputValue.push(e.detail.value[x])
+    }
+
     //Guaranteed answer question only once
     if (this.state.answerResult == '正确') {
       return
@@ -139,136 +126,50 @@ export default class Index extends Component {
     clearInterval(this.timerID)
     let statistic = Get('statistic')
 
-    //True or false
-    for (let i = 0; i < this.state.answer.length; i++) {
-      //false
-      switch (i) {
-        case 0:
-          //a lot of answer
-          if (this.state.answer[i].includes('#')) {
-            const answers = this.state.answer[i].split('#')
-            for (let answer of answers) {
-            if (this.state.valueOne != answer) {
-              statistic.push({
-                time: this.dateDiff,
-                answerResult: '错误'
-              })
-              Set({
-                key: 'statistic',
-                val: statistic
-              })
-              this.setState({
-                displayInput: 'none',
-                displayAnswer: 'flex',
-                nextButtonDisabled: false,
-              })
-              return
-            }
-          }
-          break;
+    for (let i = 0; i < inputValue.length; i++) {
+      if (this.state.answer[i].includes('#')) {
+        const answers = this.state.answer[i].split('#')
+        var mid = '错误'
+        for (let answer of answers) {
+        if (inputValue[i] == answer) {
+          mid = '正确'
+          break
         }
-          if (this.state.valueOne != this.state.answer[i]) {
-            statistic.push({
-              time: this.dateDiff,
-              answerResult: '错误'
-            })
-            Set({
-              key: 'statistic',
-              val: statistic
-            })
-            this.setState({
-              displayInput: 'none',
-              displayAnswer: 'flex',
-              nextButtonDisabled: false,
-            })
-            return
-          }
-          break;
-
-        case 1:
-           //a lot of answer
-           if (this.state.answer[i].includes('#')) {
-            const answers = this.state.answer[i].split('#')
-            for (let answer of answers) {
-            if (this.state.valueTwo != answer) {
-              statistic.push({
-                time: this.dateDiff,
-                answerResult: '错误'
-              })
-              Set({
-                key: 'statistic',
-                val: statistic
-              })
-              this.setState({
-                displayInput: 'none',
-                displayAnswer: 'flex',
-                nextButtonDisabled: false,
-              })
-              return
-            }
-          }
-          break;
-        }
-          if (this.state.valueTwo != this.state.answer[i]) {
-            statistic.push({
-              time: this.dateDiff,
-              answerResult: '错误'
-            })
-            Set({
-              key: 'statistic',
-              val: statistic
-            })
-            this.setState({
-              displayInput: 'none',
-              displayAnswer: 'flex',
-              nextButtonDisabled: false,
-            })
-            return
-          }
-          break;
-
-        case 2:
-           //a lot of answer
-           if (this.state.answer[i].includes('#')) {
-            const answers = this.state.answer[i].split('#')
-            for (let answer of answers) {
-            if (this.state.valueThree != answer) {
-              statistic.push({
-                time: this.dateDiff,
-                answerResult: '错误'
-              })
-              Set({
-                key: 'statistic',
-                val: statistic
-              })
-              this.setState({
-                displayInput: 'none',
-                displayAnswer: 'flex',
-                nextButtonDisabled: false,
-              })
-              return
-            }
-          }
-          break;
-        }
-          if (this.state.valueThree != this.state.answer[i]) {
-            statistic.push({
-              time: this.dateDiff,
-              answerResult: '错误'
-            })
-            Set({
-              key: 'statistic',
-              val: statistic
-            })
-            this.setState({
-              displayInput: 'none',
-              displayAnswer: 'flex',
-              nextButtonDisabled: false,
-            })
-            return
-          }
-          break;
       }
+      if (mid == '错误') {
+          statistic.push({
+            time: this.dateDiff,
+            answerResult: '错误'
+          })
+          Set({
+            key: 'statistic',
+            val: statistic
+          })
+          this.setState({
+            displayInput: 'none',
+            displayAnswer: 'flex',
+            nextButtonDisabled: false,
+          })
+          return   
+        }           
+    } else {
+      if (inputValue[i] != this.state.answer[i]) {
+        statistic.push({
+          time: this.dateDiff,
+          answerResult: '错误'
+        })
+        Set({
+          key: 'statistic',
+          val: statistic
+        })
+        this.setState({
+          displayInput: 'none',
+          displayAnswer: 'flex',
+          nextButtonDisabled: false,
+        })
+        return 
+      }
+    }
     }
 
     //true
@@ -283,29 +184,9 @@ export default class Index extends Component {
     this.setState({
       answerResult: '正确',
       nextButtonDisabled: false,
+      inputStyle: 'color: #52c41a;'
     })
-  }
 
-
-  handleChangeOne = value => {
-    this.setState({
-      valueOne: value
-    })
-    return value
-  }
-
-  handleChangeTwo = value => {
-    this.setState({
-      valueTwo: value
-    })
-    return value
-  }
-
-  handleChangeThree = value => {
-    this.setState({
-      valueThree: value
-    })
-    return value
   }
 
   render() {
@@ -313,14 +194,10 @@ export default class Index extends Component {
     const currentPageId = this.state.currentPageId
     const nextPageId = this.state.nextPageId
     const nextButton = this.state.nextButton
-    const valueOne = this.state.valueOne
-    const valueTwo = this.state.valueTwo
-    const valueThree = this.state.valueThree
-    const inputTwo = 'display:' + this.state.inputTwo + '; height: 7vh; border-style: solid; background-color: white; border-width: 1px; border-color: white; box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.1); border-radius: 5px'
-    const inputThree = 'display:' + this.state.inputThree + '; height: 7vh; border-style: solid; background-color: white; border-width: 1px; border-color: white; box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.1); border-radius: 5px'
     const displayInput = 'display:' + this.state.displayInput
     const displayAnswer = 'display:' + this.state.displayAnswer + '; height: 38vh'
-    const rightTop = this.state.currentPageId + '/' + '5'
+    const rightTop = this.state.currentPageId + '/' + this.state.questions.length
+    const inputStyle = this.state.inputStyle + 'height: 7vh; text-align: center; border-style: solid; background-color: white; border-width: 1px; border-color: white; box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.1); border-radius: 5px'
 
     return (
       <View catchMove={true} className='index' style='height: 100vh'>
@@ -328,7 +205,7 @@ export default class Index extends Component {
         <View className='at-row' style='height: 6vh'>
           <View className='at-col'></View>
           <View className='at-col at-col-9'><Text>用时: {this.state.time}</Text></View>
-          <View className='at-col at-col-2'><AtButton size='small' type='primary' disabled={this.state.nextButtonDisabled} onClick={this.navigateTo.bind(this, currentPageId, nextPageId)}> {nextButton}</AtButton></View>
+          <View className='at-col at-col-2'><AtButton size='small' customStyle='background-color: #87ceeb; color: white' disabled={this.state.nextButtonDisabled} onClick={this.navigateTo.bind(this, currentPageId, nextPageId)}> {nextButton}</AtButton></View>
           <View className='at-col'></View>
         </View>
 
@@ -339,31 +216,26 @@ export default class Index extends Component {
 
           <View className='at-row at-row--wrap at-row__justify--center' style={displayInput}>
             <View className='at-col at-col-11'>
-              <View className='at-col at-col-12' style='height: 10vh'>
-                <View className='at-col at-col-12' style='height: 7vh; border-style: solid; background-color: white; border-width: 1px; border-color: white; box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.1); border-radius: 5px'>
-                  <AtInput title='空1' type='text' name='inputOne' border={false} placeholder='请输入空1的答案' value={valueOne} onChange={this.handleChangeOne.bind(this)} />
-                </View>
-              </View>
-              <View className='at-col at-col-12' style='height: 10vh'>
-                <View className='at-col at-col-12' style={inputTwo}>
-                  <AtInput title='空2' type='text' name='inputTwo' border={false} placeholder='请输入空2的答案' value={valueTwo} onChange={this.handleChangeTwo.bind(this)} />
-                </View>
-              </View>
-              <View className='at-col at-col-12' style='height: 10vh'>
-                <View className='at-col at-col-12' style={inputThree}>
-                  <AtInput title='空3' type='text' name='inputThree' border={false} placeholder='请输入空3的答案' value={valueThree} onChange={this.handleChangeThree.bind(this)} />
-                </View>
-              </View>
-              <AtButton className='submit' type='primary' onClick={this.submit.bind(this, '1')}>提交</AtButton>
+              <Form onSubmit={this.formSubmit.bind(this)}>
+              {this.state.blankNumberArray.map((number) => {
+                console.log(number)
+                const placeholder = '请输入空' + number + '的答案'
+                return(
+                  <View className='at-col at-col-12 at-row--wrap' style='height: 10vh;'>
+                    <Input name={number} style={inputStyle} type='text' border={false} placeholder={placeholder} />
+                    </View>
+                )
+              })}
+              <Button formType='submit' style='padding: 4px; border-radius: 60px; background-color: #87ceeb; box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.1); color: white; font-size: 16px'>提交</Button>
+              </Form>
             </View>
           </View>
-
 
           <View className='at-row at-row--wrap at-row__justify--center' style={displayAnswer}>
           {/* <View className='at-col at-col-11' style='height: 2vh'></View> */}
             <View className='at-col at-col-11' style='background-color: white;border-style: solid; border-width: 1px; border-color: white; box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.1); border-radius: 5px'>
               <View style='height: 2vh'></View>
-              <View className='at-row' style='height: 6vh'>
+              <View className='at-row' style='height: 8vh'>
                 <View className='at-col at-col__offset-1'>
                   <Image style='height: 14px; width: 3px' src={icon} />
                   <Text style='font-size: 18px' space='nbsp'>  正确答案</Text>

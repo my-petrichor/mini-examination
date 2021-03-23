@@ -1,0 +1,30 @@
+  #line {
+    width: 90vw;
+    height: 40vh;
+    margin-top: 37vh;
+  }
+
+  .return {
+    color: black;
+    border-color: gray;
+}
+
+.echarts {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+
+
+.index {
+	background-image: url('../../pictures/background.png');
+  }
+
